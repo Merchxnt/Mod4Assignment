@@ -1,0 +1,61 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.sql.*"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Order Details</title>
+    </head>
+    <body>
+        <%
+        //Use a try catch block to catch any errors
+            try {
+        //Create a connection to the database
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/classicmodels",
+                        "root", "admin");
+
+        //Create a new statement using the database connection
+                Statement statement = connection.createStatement();
+
+        //Execute a SELECT query to retrieve a resultset containing the order details
+                ResultSet resultset = statement.executeQuery("SELECT orders.orderDate, orders.shippedDate, orderDetails.productCode, orderDetails.quantityOrdered, orderDetails.priceEach FROM Orders, OrderDetails WHERE orders.ordernumber = orderdetails.ordernumber AND orders.ordernumber = '" + request.getParameter("orderNumber") + "';");
+
+        //Loop through the records in the result set - in case there are multiple products in the order
+                while (resultset.next()) {
+        %>
+        <table>
+            <tr>
+                <td>Order Date: </td>
+                <td><%out.print(resultset.getString("orderdate"));%></td>
+            </tr>
+            <tr>
+                <td>Shipped Date: </td>
+                <td><%out.print(resultset.getString("shippeddate"));%></td>
+            </tr>
+            <tr>
+                <td>Product Code: </td>
+                <td><%out.print(resultset.getString("productcode"));%></td>
+            </tr>
+            <tr>
+                <td>Quantity Ordered: </td>
+                <td><%out.print(resultset.getString("quantityordered"));%></td>
+            </tr>
+            <tr>
+                <td>Price Each: </td>
+                <td><%out.print(resultset.getString("priceeach"));%>
+            </tr>
+        </table>
+        <%
+                }//end while
+
+        //Close the connection to the database
+                connection.close();
+
+            } catch (Exception e) {
+        //Print the error message for any exception that is caught
+                e.printStackTrace();
+            }//end try catch
+        %>
+    </body>
+</html>
